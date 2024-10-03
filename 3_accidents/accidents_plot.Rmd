@@ -1,0 +1,60 @@
+---
+title: "accidents_recreate_plot"
+author: "Qimiao Li"
+date: "2024-10-03"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(patchwork)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+accidents <- readRDS(here("data", "accidents.rds"))
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+Weekday <- filter(accidents, day_of_week != "Saturday" & day_of_week != "Sunday")
+Weekend <- filter(accidents, day_of_week == "Saturday" | day_of_week == "Sunday")
+plot1 <- Weekday %>%
+  ggplot(aes(x = time, color = severity, fill = severity)) +
+  geom_density(alpha = 0.6) +
+  labs (x = "Time of day", y = "Density")+
+  ggtitle("Number of accidents throughtout the day") 
+  
+plot2 <- Weekend %>%
+  ggplot(aes(x = time, color = severity, fill = severity)) +
+  geom_density(alpha = 0.6) +
+  labs (x = "Time of day", y = "Density")+
+  ggtitle("Number of accidents throughtout the day")
+
+plot1/plot2
+Weekday <- filter(accidents, day_of_week != "Saturday" & day_of_week != "Sunday")
+mutate(filter(accidents, day_of_week != "Saturday" & day_of_week != "Sunday") = "Weekday")
+
+accidents2 <- accidents %>% 
+  mutate(day_week = ifelse(wday(date) %in% c(1,7), "Weekend", "Weekday" ))
+
+accidents2 %>%
+  ggplot(aes(x = time, fill = severity)) +
+  geom_density(alpha = 0.6) +
+  labs (x = "Time of day", y = "Density")+
+  ggtitle("Number of accidents throughtout the day") +
+  facet_wrap(~day_week, dir = "v")
+  
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
